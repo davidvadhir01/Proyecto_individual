@@ -3,60 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio | Mi Aplicación</title>
+    <title>CinéLibro - Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --book-brown: #8B4513;
+            --book-gold: #D4AF37;
+            --cinema-red: #DC3545;
+            --cinema-black: #121212;
+            --parchment: #F5F5DC;
+        }
+        
         body {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .home-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        
+        .home-card {
+            background-color: rgba(33, 33, 33, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            width: 500px;
+            max-width: 90%;
+            padding: 0;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .card-header {
+            background-color: var(--book-brown);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--book-gold);
+        }
+        
+        .card-header h2 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            color: var(--book-gold);
+            font-weight: 700;
+            font-size: 2.2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+            }
+        }
+        
+        .welcome-message {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .username {
+            color: var(--book-gold);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .username:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -3px;
+            left: 0;
+            background-color: var(--cinema-red);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s;
+        }
+        
+        .username:hover:after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .btn-custom {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            transition: all 0.4s;
+            transform-style: preserve-3d;
+            z-index: 1;
+        }
+        
+        .btn-custom:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.4s;
+            z-index: -1;
+            transform: translateX(-100%);
+        }
+        
+        .btn-custom:hover:before {
+            transform: translateX(100%);
+        }
+        
+        .btn-edit-profile {
+            background-color: var(--book-gold);
+            color: var(--cinema-black);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .container {
-            max-width: 500px;
+        
+        .btn-edit-profile:hover {
+            background-color: #c39b2b;
+            color: var(--cinema-black);
+            transform: translateY(-5px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
         }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            background: white;
+        
+        .btn-edit-profile i {
+            margin-right: 10px;
+        }
+        
+        .btn-logout {
+            background-color: var(--cinema-red);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-logout:hover {
+            background-color: #bd2130;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-logout i {
+            margin-right: 10px;
+        }
+        
+        .book-decoration {
+            position: relative;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid var(--book-gold);
+            border-radius: 8px;
+            background-color: rgba(139, 69, 19, 0.2);
+        }
+        
+        .book-decoration:before {
+            content: '📚';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background-color: rgba(33, 33, 33, 0.9);
+            padding: 0 10px;
+        }
+        
+        .book-decoration:after {
+            content: '🎬';
+            position: absolute;
+            bottom: -15px;
+            right: 20px;
+            background-color: rgba(33, 33, 33, 0.9);
+            padding: 0 10px;
+        }
+        
+        .quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
             text-align: center;
+            margin: 0;
         }
-        .btn-custom {
+        
+        .quote-author {
+            text-align: right;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--book-gold);
+        }
+        
+        /* Animación para la tarjeta */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .home-card {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        /* Elementos decorativos flotantes */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            border-radius: 10px;
-            transition: 0.3s;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
         }
-        .btn-custom:hover {
-            transform: scale(1.05);
+        
+        .element {
+            position: absolute;
+            opacity: 0.4;
+            animation: float 15s infinite linear;
+            font-size: 1.5rem;
         }
-        .logout-btn {
-            background-color: #dc3545;
-            border: none;
+        
+        .element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-duration: 25s;
+            animation-delay: 0s;
         }
-        .logout-btn:hover {
-            background-color: #c82333;
+        
+        .element:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-duration: 18s;
+            animation-delay: 2s;
+        }
+        
+        .element:nth-child(3) {
+            bottom: 15%;
+            left: 15%;
+            animation-duration: 20s;
+            animation-delay: 5s;
+        }
+        
+        .element:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-duration: 22s;
+            animation-delay: 7s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="card">
-        <h2 class="mb-3">Bienvenido, <span th:text="${username}"></span> 👋</h2>
-        <p class="text-muted">Aquí puedes editar tu perfil o cerrar sesión.</p>
-        
-        <a href="/perfil/editar" class="btn btn-primary btn-custom mb-2">✏️ Editar Perfil</a>
-        
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-custom logout-btn">🚪 Cerrar Sesión</button>
-        </form>
+    <!-- Elementos decorativos flotantes -->
+    <div class="floating-elements">
+        <div class="element">📖</div>
+        <div class="element">🎞️</div>
+        <div class="element">🎭</div>
+        <div class="element">📽️</div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="home-container">
+        <div class="home-card">
+            <div class="card-header">
+                <h2>CinéLibro</h2>
+            </div>
+            
+            <div class="card-body">
+                <div class="welcome-message">
+                    Bienvenido, <span class="username" th:text="${username}">Usuario</span> 👋
+                </div>
+                
+                <p class="text-center mb-4">Explora el maravilloso mundo donde la literatura y el cine convergen.</p>
+                
+                <a href="/perfil/editar" class="btn btn-custom btn-edit-profile">
+                    <span>✏️ Editar Perfil</span>
+                </a>
+                
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-custom btn-logout">
+                        <span>🚪 Cerrar Sesión</span>
+                    </button>
+                </form>
+                
+                <div class="book-decoration">
+                    <p class="quote">"No hay amigo tan leal como un libro, ni película que capture mejor los sueños."</p>
+                    <p class="quote-author">- CinéLibro</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
