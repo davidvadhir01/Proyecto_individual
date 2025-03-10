@@ -1,8 +1,10 @@
 Sistema de Autenticación CinéLibro
-Show Image
-Show Image
-Show Image
-Show Image
+Panel admin:
+![image](https://github.com/user-attachments/assets/ed834e97-a6e6-4d78-81ab-824ea0df8020)
+Login:
+
+![image](https://github.com/user-attachments/assets/6e449411-eb25-4791-a874-bec68ddc2ebb)
+
 Un sistema completo de autenticación con temática de libros y películas implementado con Spring Boot, Spring Security y MySQL.
 📋 Características
 
@@ -133,4 +135,4 @@ Abre un Pull Request
 📄 Licencia
 Este proyecto está bajo la Licencia MIT - mira el archivo LICENSE para detalles
 ✉️ Contacto
-David Herrera - GitHub - Email
+David Balderas - GitHub - Email
