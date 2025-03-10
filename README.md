@@ -132,6 +132,11 @@ Haz commit de tus cambios (git commit -m 'Añadir nueva característica')
 Push a la rama (git push origin feature/nueva-caracteristica)
 Abre un Pull Request
 
+PRUEBAS CON THUNDER CLIENT
+CON LA PAGINA REGISTER:
+![image](https://github.com/user-attachments/assets/7e427951-7511-4309-b290-75f926ef41c5)
+
+
 📄 Licencia
 Este proyecto está bajo la Licencia MIT - mira el archivo LICENSE para detalles
 ✉️ Contacto
