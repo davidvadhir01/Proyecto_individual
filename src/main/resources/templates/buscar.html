@@ -3,617 +3,553 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle} + ' - CinéLibro'">Buscar - CinéLibro</title>
+    <title th:text="${pageTitle} ?: 'Buscar Contenido'">Buscar Contenido</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --book-brown: #8B4513;
-            --book-gold: #D4AF37;
-            --cinema-red: #DC3545;
-            --cinema-black: #121212;
-            --parchment: #F5F5DC;
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
-                        url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: white;
-            padding: 20px 0;
+            color: var(--dark-color);
         }
-        
-        .search-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+
+        .main-container {
+            min-height: 100vh;
+            padding: 2rem 0;
         }
-        
+
         .search-header {
-            background-color: rgba(33, 33, 33, 0.9);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
             text-align: center;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
         }
-        
-        .search-header h1 {
-            font-family: 'Playfair Display', serif;
-            color: var(--book-gold);
+
+        .search-title {
             font-size: 2.5rem;
-            margin-bottom: 10px;
-            animation: glow 2s ease-in-out infinite alternate;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
-        
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-            }
-            to {
-                text-shadow: 0 0 20px rgba(212, 175, 55, 1);
-            }
+
+        .search-subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
         }
-        
-        .search-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
+
         .search-form {
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
         .search-input-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
         }
-        
+
         .search-input {
             width: 100%;
-            padding: 15px 60px 15px 20px;
-            border: none;
-            border-radius: 50px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
+            padding: 1rem 1rem 1rem 3.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius);
             font-size: 1.1rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            background: white;
         }
-        
+
         .search-input:focus {
             outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-        
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .search-button {
+
+        .search-icon {
             position: absolute;
-            right: 5px;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            background-color: var(--book-gold);
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            color: var(--cinema-black);
-        }
-        
-        .search-button:hover {
-            background-color: var(--cinema-red);
-            color: white;
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(0, 0, 0, 0.3);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.3s;
+            color: #9ca3af;
             font-size: 1.2rem;
         }
-        
-        .back-button:hover {
-            background-color: rgba(0, 0, 0, 0.5);
-            transform: scale(1.1);
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
             color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
         }
-        
-        .results-section {
-            background-color: rgba(33, 33, 33, 0.9);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
-        
-        .results-header {
-            border-bottom: 2px solid var(--book-gold);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+
+        .navigation-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
-        
-        .results-header h2 {
-            color: var(--book-gold);
-            font-family: 'Playfair Display', serif;
-            margin: 0;
+
+        .nav-tab {
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
-        
-        .results-count {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            margin-top: 5px;
+
+        .nav-tab:hover {
+            background: white;
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: var(--primary-color);
         }
-        
+
+        .nav-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .results-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
-        
+
         .result-card {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            background: white;
+            border-radius: var(--border-radius);
             overflow: hidden;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
         }
-        
+
         .result-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            border-color: var(--book-gold);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
-        
+
         .result-image {
             width: 100%;
-            height: 200px;
+            height: 300px;
             object-fit: cover;
-            background-color: rgba(0, 0, 0, 0.3);
+            background: #f3f4f6;
         }
-        
+
         .result-content {
-            padding: 20px;
+            padding: 1.5rem;
         }
-        
+
         .result-title {
-            color: var(--book-gold);
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .result-meta {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-        
-        .result-description {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.85rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
             line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
-        
+
+        .result-info {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-description {
+            color: #4b5563;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
         .result-rating {
-            display: inline-block;
-            background-color: var(--cinema-red);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
-        
-        .add-favorite-btn {
-            background-color: var(--book-gold);
-            color: var(--cinema-black);
+
+        .rating-stars {
+            color: #fbbf24;
+        }
+
+        .favorite-btn {
+            background: var(--success-color);
+            color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
             cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
         }
-        
-        .add-favorite-btn:hover {
-            background-color: var(--cinema-red);
-            color: white;
-            transform: scale(1.05);
+
+        .favorite-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
-        
-        .no-results {
-            text-align: center;
-            padding: 50px;
-            color: rgba(255, 255, 255, 0.6);
+
+        .favorite-btn.added {
+            background: var(--warning-color);
         }
-        
+
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.1);
+            color: #3730a3;
+            border-left: 4px solid var(--primary-color);
+        }
+
         .loading {
             text-align: center;
-            padding: 40px;
-            color: var(--book-gold);
+            padding: 3rem;
+            color: #6b7280;
         }
-        
-        .loading-spinner {
-            border: 3px solid rgba(212, 175, 55, 0.3);
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary-color);
             border-radius: 50%;
-            border-top: 3px solid var(--book-gold);
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 1rem;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .alert {
-            border-radius: 10px;
-            border: none;
-            margin-bottom: 20px;
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-color);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
         }
-        
-        .alert-success {
-            background-color: rgba(25, 135, 84, 0.2);
-            border-left: 4px solid #198754;
-            color: #d1e7dd;
+
+        .back-btn:hover {
+            background: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            transform: translateY(-2px);
         }
-        
-        .alert-danger {
-            background-color: rgba(220, 53, 69, 0.2);
-            border-left: 4px solid var(--cinema-red);
-            color: #f8d7da;
-        }
-        
-        .alert-info {
-            background-color: rgba(13, 110, 253, 0.2);
-            border-left: 4px solid #0d6efd;
-            color: #b6d4fe;
-        }
-        
-        /* Responsive */
+
         @media (max-width: 768px) {
-            .search-header h1 {
-                font-size: 2rem;
-            }
-            
-            .search-icon {
+            .search-title {
                 font-size: 2rem;
             }
             
             .results-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 15px;
+                grid-template-columns: 1fr;
             }
             
-            .search-container {
-                padding: 0 10px;
+            .navigation-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .main-container {
+                padding: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="search-container">
-        <!-- Botón de regreso -->
-        <a href="/home" class="back-button">←</a>
-        
-        <!-- Header de búsqueda -->
-        <div class="search-header">
-            <div class="search-icon" th:text="${searchType == 'peliculas' ? '🎬' : '📚'}">🔍</div>
-            <h1 th:text="${pageTitle}">Buscar</h1>
-            <p th:text="${searchType == 'peliculas' ? 'Descubre las mejores películas de todos los tiempos' : 'Encuentra tu próximo libro favorito'}">
-                Busca en nuestra extensa base de datos
-            </p>
-            
-            <!-- Formulario de búsqueda -->
-            <form class="search-form" th:action="@{'/buscar/' + ${searchType}}" method="get">
-                <div class="search-input-group">
-                    <input type="text" 
-                           name="query" 
-                           class="search-input" 
-                           th:placeholder="${searchType == 'peliculas' ? 'Buscar películas (ej: El Padrino, Inception...)' : 'Buscar libros (ej: Cien años de soledad, Harry Potter...)'}"
-                           th:value="${query}"
-                           required
-                           autofocus>
-                    <button type="submit" class="search-button">
-                        🔍
-                    </button>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Mensajes de estado -->
-        <div th:if="${error}" class="alert alert-danger" role="alert">
-            <span th:text="${error}">Error en la búsqueda</span>
-        </div>
-        
-        <div th:if="${mensaje}" class="alert alert-info" role="alert">
-            <span th:text="${mensaje}">Información</span>
-        </div>
-        
-        <!-- Resultados de búsqueda -->
-        <div th:if="${resultados != null}" class="results-section">
-            <div class="results-header">
-                <h2>
-                    <span th:text="${searchType == 'peliculas' ? '🎬 Películas encontradas' : '📚 Libros encontrados'}">Resultados</span>
-                </h2>
-                <div class="results-count">
-                    <span th:text="${totalResultados}">0</span> resultados para 
-                    "<span th:text="${query}">búsqueda</span>"
-                </div>
+    <div class="main-container">
+        <div class="container">
+            <!-- Botón de regreso -->
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Volver al inicio
+            </a>
+
+            <!-- Navegación entre tipos de búsqueda -->
+            <div class="navigation-tabs">
+                <a href="/buscar/peliculas" 
+                   class="nav-tab" 
+                   th:classappend="${searchType == 'peliculas'} ? 'active' : ''">
+                    <i class="fas fa-film"></i> Películas
+                </a>
+                <a href="/buscar/libros" 
+                   class="nav-tab" 
+                   th:classappend="${searchType == 'libros'} ? 'active' : ''">
+                    <i class="fas fa-book"></i> Libros
+                </a>
             </div>
-            
-            <!-- Grid de resultados -->
-            <div class="results-grid" th:if="${!resultados.isEmpty()}">
-                <div th:each="item : ${resultados}" 
-                     class="result-card" 
-                     th:onclick="'mostrarDetalles(\'' + ${item.id} + '\', \'' + ${searchType} + '\')'">
-                    
-                    <!-- Imagen -->
-                    <img th:src="${item.imagen}" 
-                         th:alt="${item.titulo ?: item.autor}" 
-                         class="result-image"
-                         onerror="this.src='/images/no-image.png'">
-                    
-                    <!-- Contenido -->
-                    <div class="result-content">
-                        <!-- Título -->
-                        <h3 class="result-title" th:text="${item.titulo}">Título</h3>
+
+            <!-- Header de búsqueda -->
+            <div class="search-header">
+                <h1 class="search-title" th:text="${pageTitle}">Buscar Contenido</h1>
+                <p class="search-subtitle" th:text="${searchType == 'peliculas'} ? 'Descubre las mejores películas' : 'Encuentra tu próximo libro favorito'">
+                    Descubre contenido increíble
+                </p>
+
+                <!-- Formulario de búsqueda -->
+                <form class="search-form" method="get">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               name="query" 
+                               class="search-input"
+                               th:placeholder="${searchPlaceholder} ?: 'Buscar...'"
+                               th:value="${query}"
+                               autofocus>
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contenedor de resultados -->
+            <div class="results-container" th:if="${query != null}">
+                <!-- Mensajes de estado -->
+                <div th:if="${error}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Error:</strong> <span th:text="${error}">Error de búsqueda</span>
+                </div>
+
+                <div th:if="${mensaje and not error}" class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span th:text="${mensaje}">Mensaje informativo</span>
+                </div>
+
+                <!-- Resultados -->
+                <div th:if="${resultados and not error}" class="results-grid">
+                    <div th:each="item : ${resultados}" class="result-card">
+                        <img th:src="${item.imagen}" 
+                             th:alt="${item.titulo}"
+                             class="result-image"
+                             onerror="this.src='/images/no-image.png'">
                         
-                        <!-- Metadatos -->
-                        <div class="result-meta">
-                            <!-- Para películas -->
+                        <div class="result-content">
+                            <h3 class="result-title" th:text="${item.titulo}">Título</h3>
+                            
+                            <!-- Información específica por tipo -->
                             <div th:if="${searchType == 'peliculas'}">
-                                <span th:if="${item.fechaEstreno}" th:text="${item.fechaEstreno}">2023</span>
-                                <span th:if="${item.puntuacion}" class="result-rating">
-                                    ⭐ <span th:text="${item.puntuacion}">8.5</span>
-                                </span>
+                                <div class="result-info">
+                                    <i class="fas fa-calendar"></i>
+                                    <span th:text="${item.fechaEstreno} ?: 'Fecha no disponible'">Fecha</span>
+                                </div>
+                                <div class="result-rating" th:if="${item.puntuacion}">
+                                    <span class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                    <span th:text="${item.puntuacion} + '/10'">Rating</span>
+                                </div>
                             </div>
                             
-                            <!-- Para libros -->
                             <div th:if="${searchType == 'libros'}">
-                                <strong th:if="${item.autores}" th:text="${item.autores}">Autor</strong>
-                                <div th:if="${item.editorial}">
-                                    Editorial: <span th:text="${item.editorial}">Editorial</span>
+                                <div class="result-info">
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="${item.autores} ?: 'Autor no disponible'">Autor</span>
                                 </div>
-                                <span th:if="${item.puntuacion}" class="result-rating">
-                                    ⭐ <span th:text="${item.puntuacion}">4.5</span>
-                                </span>
+                                <div class="result-info" th:if="${item.editorial}">
+                                    <i class="fas fa-building"></i>
+                                    <span th:text="${item.editorial}">Editorial</span>
+                                </div>
                             </div>
+                            
+                            <p class="result-description" th:text="${item.descripcion} ?: ${item.sinopsis} ?: 'Sin descripción disponible'">
+                                Descripción del contenido
+                            </p>
+                            
+                            <button class="favorite-btn" 
+                                    th:data-id="${item.id}"
+                                    th:data-titulo="${item.titulo}"
+                                    th:data-tipo="${searchType}"
+                                    onclick="agregarAFavoritos(this)">
+                                <i class="fas fa-heart"></i>
+                                Agregar a Favoritos
+                            </button>
                         </div>
-                        
-                        <!-- Descripción -->
-                        <p class="result-description" 
-                           th:text="${item.sinopsis ?: item.descripcion}">
-                            Descripción del contenido...
-                        </p>
-                        
-                        <!-- Botón para agregar a favoritos -->
-                        <button class="add-favorite-btn" 
-                                th:onclick="'event.stopPropagation(); agregarAFavoritos(\'' + ${item.id} + '\', \'' + ${item.titulo} + '\', \'' + ${searchType} + '\')'">
-                            ⭐ Agregar a Favoritos
-                        </button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- No hay resultados -->
-            <div th:if="${resultados.isEmpty()}" class="no-results">
-                <div style="font-size: 4rem; margin-bottom: 20px;">
-                    <span th:text="${searchType == 'peliculas' ? '🎬' : '📚'}">🔍</span>
-                </div>
-                <h3>No se encontraron resultados</h3>
-                <p>Intenta con otros términos de búsqueda</p>
-            </div>
-        </div>
-        
-        <!-- Estado de carga -->
-        <div id="loading" class="loading" style="display: none;">
-            <div class="loading-spinner"></div>
-            <p>Buscando...</p>
-        </div>
-    </div>
 
-    <!-- Modal para detalles -->
-    <div class="modal fade" id="detallesModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="background-color: rgba(33, 33, 33, 0.95); color: white; border: none;">
-                <div class="modal-header" style="border-bottom: 2px solid var(--book-gold);">
-                    <h5 class="modal-title" style="color: var(--book-gold);">Detalles</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="modalBody">
-                    <!-- Contenido dinámico -->
-                </div>
-                <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn" style="background-color: var(--book-gold); color: var(--cinema-black);" 
-                            onclick="agregarAFavoritosDesdeModal()">
-                        ⭐ Agregar a Favoritos
-                    </button>
+                <!-- Mensaje cuando no hay resultados -->
+                <div th:if="${query and totalResultados == 0 and not error}" class="loading">
+                    <i class="fas fa-search" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <h3>No se encontraron resultados</h3>
+                    <p>Intenta con otros términos de búsqueda</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast para notificaciones -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="favoriteToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-heart text-success me-2"></i>
+                <strong class="me-auto">Favoritos</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Mensaje de favoritos
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        let currentItem = null;
-        
-        // Función para mostrar loading
-        function mostrarLoading() {
-            document.getElementById('loading').style.display = 'block';
-        }
-        
-        function ocultarLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-        
-        // Función para mostrar detalles
-        async function mostrarDetalles(id, tipo) {
-            try {
-                mostrarLoading();
-                
-                const response = await fetch(`/buscar/${tipo === 'peliculas' ? 'pelicula' : 'libro'}/${id}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentItem = data.data;
-                    mostrarModalDetalles(data.data, tipo);
-                } else {
-                    alert('Error al obtener detalles: ' + data.error);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al obtener detalles');
-            } finally {
-                ocultarLoading();
-            }
-        }
-        
-        // Función para mostrar modal con detalles
-        function mostrarModalDetalles(item, tipo) {
-            const modalBody = document.getElementById('modalBody');
-            
-            let html = `
-                <div class="row">
-                    <div class="col-md-4">
-                        <img src="${item.imagen}" alt="${item.titulo}" class="img-fluid rounded" 
-                             style="max-height: 400px; object-fit: cover;">
-                    </div>
-                    <div class="col-md-8">
-                        <h3 style="color: var(--book-gold);">${item.titulo}</h3>
-            `;
-            
-            if (tipo === 'peliculas') {
-                html += `
-                    <p><strong>Fecha de estreno:</strong> ${item.fechaEstreno || 'No disponible'}</p>
-                    <p><strong>Puntuación:</strong> ⭐ ${item.puntuacion || 'No disponible'}</p>
-                    <p><strong>Duración:</strong> ${item.duracion ? item.duracion + ' minutos' : 'No disponible'}</p>
-                    <p><strong>Géneros:</strong> ${item.generosTexto || 'No disponible'}</p>
-                    <p><strong>Actores:</strong> ${item.actores || 'No disponible'}</p>
-                `;
-            } else {
-                html += `
-                    <p><strong>Autor(es):</strong> ${item.autores || 'No disponible'}</p>
-                    <p><strong>Editorial:</strong> ${item.editorial || 'No disponible'}</p>
-                    <p><strong>Fecha de publicación:</strong> ${item.fechaPublicacion || 'No disponible'}</p>
-                    <p><strong>Páginas:</strong> ${item.paginas || 'No disponible'}</p>
-                    <p><strong>Categorías:</strong> ${item.categorias || 'No disponible'}</p>
-                    <p><strong>Puntuación:</strong> ${item.puntuacion ? '⭐ ' + item.puntuacion : 'No disponible'}</p>
-                `;
-            }
-            
-            html += `
-                        <p><strong>Descripción:</strong></p>
-                        <p style="text-align: justify;">${item.descripcionCompleta || item.descripcion || item.sinopsis || 'No disponible'}</p>
-                    </div>
-                </div>
-            `;
-            
-            modalBody.innerHTML = html;
-            
-            // Mostrar modal
-            const modal = new bootstrap.Modal(document.getElementById('detallesModal'));
-            modal.show();
-        }
-        
         // Función para agregar a favoritos
-        async function agregarAFavoritos(id, titulo, tipo) {
+        async function agregarAFavoritos(button) {
+            const id = button.dataset.id;
+            const titulo = button.dataset.titulo;
+            const tipo = button.dataset.tipo;
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agregando...';
+            
             try {
-                // Aquí implementaremos la lógica para agregar a favoritos
-                // Por ahora, solo mostramos un mensaje
-                alert(`¡${titulo} agregado a favoritos!`);
+                const endpoint = tipo === 'peliculas' ? '/api/favoritos/pelicula' : '/api/favoritos/libro';
                 
-                // TODO: Implementar llamada al backend para guardar en favoritos
-                /*
-                const response = await fetch('/api/favoritos', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        itemId: id,
-                        titulo: titulo,
-                        tipo: tipo
-                    })
+                    body: JSON.stringify({ titulo: titulo })
                 });
                 
-                if (response.ok) {
-                    alert(`¡${titulo} agregado a favoritos!`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    button.classList.add('added');
+                    button.innerHTML = '<i class="fas fa-check"></i> ¡Agregado!';
+                    mostrarToast(`"${titulo}" agregado a favoritos`, 'success');
                 } else {
-                    alert('Error al agregar a favoritos');
+                    throw new Error(result.error || 'Error desconocido');
                 }
-                */
+                
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al agregar a favoritos');
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                mostrarToast('Error al agregar a favoritos', 'error');
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                    if (!button.classList.contains('added')) {
+                        button.innerHTML = '<i class="fas fa-heart"></i> Agregar a Favoritos';
+                    }
+                }, 2000);
             }
         }
         
-        // Función para agregar a favoritos desde el modal
-        function agregarAFavoritosDesdeModal() {
-            if (currentItem) {
-                const tipo = document.querySelector('[name="searchType"]') ? 
-                    document.querySelector('[name="searchType"]').value : 
-                    (window.location.pathname.includes('peliculas') ? 'peliculas' : 'libros');
-                agregarAFavoritos(currentItem.id, currentItem.titulo, tipo);
-            }
-        }
-        
-        // Manejo del formulario de búsqueda
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.search-form');
-            if (form) {
-                form.addEventListener('submit', function() {
-                    mostrarLoading();
-                });
+        // Función para mostrar toast
+        function mostrarToast(message, type = 'success') {
+            const toastElement = document.getElementById('favoriteToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastHeader = toastElement.querySelector('.toast-header i');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'success') {
+                toastHeader.className = 'fas fa-heart text-success me-2';
+            } else {
+                toastHeader.className = 'fas fa-exclamation-triangle text-danger me-2';
             }
             
-            // Auto-focus en el input de búsqueda
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+        
+        // Auto-focus en el campo de búsqueda
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('.search-input');
             if (searchInput && !searchInput.value) {
                 searchInput.focus();
             }
         });
+        
+        // Búsqueda en tiempo real (opcional)
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                // Aquí podrías implementar búsqueda AJAX en tiempo real
+            }, 500);
+        }
     </script>
 </body>
 </html>

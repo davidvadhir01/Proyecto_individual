@@ -15,6 +15,8 @@ services:
       --skip-name-resolve
       --innodb-use-native-aio=0
       --innodb-flush-method=fsync
+      --wait-timeout=28800
+      --interactive-timeout=28800
     environment:
       MYSQL_DATABASE: tarea2
       MYSQL_USER: admin
@@ -29,33 +31,57 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-      start_period: 120s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
 
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: springboot-app1
-    restart: on-failure
+    restart: on-failure:3
     depends_on:
       mysql:
         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/tarea2?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false&maxReconnects=10"
+      # ✅ CONFIGURACIÓN DE BASE DE DATOS MEJORADA
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/tarea2?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&connectTimeout=60000&socketTimeout=60000"
       SPRING_DATASOURCE_USERNAME: "admin"
       SPRING_DATASOURCE_PASSWORD: "admin"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      
+      # ✅ CONFIGURACIÓN JPA CONSERVADORA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
-      # Configuraciones adicionales para reconexión
+      SPRING_JPA_SHOW_SQL: "false"
+      
+      # ✅ CONFIGURACIÓN HIKARI OPTIMIZADA
       SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "30000"
       SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: "5000"
       SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: "1800000"
       SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: "60000"
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "10"
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "5"
+      
+      # ✅ LOGGING PARA DEBUG
+      LOGGING_LEVEL_COM_EXAMPLE_DEMO: "DEBUG"
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: "WARN"
+      
+      # ✅ VARIABLES DE ENTORNO PARA APIS (opcional)
+      TMDB_API_KEY: "${TMDB_API_KEY:-TU_API_KEY_DE_TMDB_AQUI}"
+      GOOGLE_BOOKS_API_KEY: "${GOOGLE_BOOKS_API_KEY:-TU_API_KEY_DE_GOOGLE_BOOKS_AQUI}"
     networks:
       - app-network
+    # ✅ HEALTHCHECK PARA LA APLICACIÓN
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/ping", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 
 networks:
   app-network:
@@ -63,3 +89,4 @@ networks:
 
 volumes:
   mysql-data:
+    driver: local

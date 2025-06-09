@@ -18,7 +18,7 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // ✅ CAMBIO AQUÍ: Mapear al nombre correcto de la columna
+    // ✅ CORRECCIÓN: Mapear correctamente a la columna password_hash
     @Column(name = "password_hash", nullable = false)
     private String password;
 
@@ -42,9 +42,10 @@ public class Usuario {
     @Column(name = "imagen_tipo", length = 100)
     private String imagenTipo;
 
+    // ✅ CORRECCIÓN: Usar el nombre correcto de la tabla de unión
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "usuario_roles",
+            name = "usuario_roles",  // ⚠️ NOMBRE CORRECTO SIN GUION BAJO
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )
@@ -153,5 +154,16 @@ public class Usuario {
             return "/api/usuarios/" + id + "/imagen";
         }
         return "/images/default-avatar.png"; // Imagen por defecto
+    }
+
+    // ✅ MÉTODO ÚTIL: toString para debugging
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                ", roles=" + (roles != null ? roles.size() : 0) + " roles" +
+                '}';
     }
 }

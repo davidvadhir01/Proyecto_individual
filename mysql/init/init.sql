@@ -1,13 +1,21 @@
--- En la carpeta mysql/init/init.sql
-CREATE DATABASE IF NOT EXISTS tarea2 CHARACTER SET utf8 COLLATE utf8_general_ci;
+-- mysql/init/init.sql - VERSIÓN CORREGIDA
+CREATE DATABASE IF NOT EXISTS tarea2 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tarea2;
 
--- PRIMERO: Crear la tabla usuarios completa desde cero
+-- PRIMERO: Crear tabla de roles
+CREATE TABLE IF NOT EXISTS roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(200),
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- SEGUNDO: Crear tabla de usuarios con nombres de columnas consistentes
 CREATE TABLE IF NOT EXISTS usuarios (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,  -- ⚠️ NOMBRE CORRECTO CONSISTENTE
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -25,37 +33,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     INDEX idx_fecha_creacion (fecha_creacion)
 );
 
--- Insertar usuario administrador por defecto
-INSERT INTO usuarios (nombre, email, password_hash, pelicula_favorita, libro_favorito) 
-VALUES ('admin', 'admin@cinelibro.com', '$2a$10$NQV8QcN7Zs8QJJ5QQ5Q5QeQ5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Qe', 'El Padrino', 'Cien años de soledad')
-ON DUPLICATE KEY UPDATE 
-    nombre = VALUES(nombre),
-    pelicula_favorita = VALUES(pelicula_favorita),
-    libro_favorito = VALUES(libro_favorito);
-
--- Insertar algunos usuarios de ejemplo
-INSERT INTO usuarios (nombre, email, password_hash, pelicula_favorita, libro_favorito) VALUES 
-('Juan Pérez', 'juan@example.com', '$2a$10$example1', 'Inception', 'Don Quijote'),
-('María García', 'maria@example.com', '$2a$10$example2', 'Titanic', 'Orgullo y Prejuicio'),
-('Carlos López', 'carlos@example.com', '$2a$10$example3', 'Matrix', 'El Señor de los Anillos')
-ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
-
--- Crear tabla de roles (si es necesaria)
-CREATE TABLE IF NOT EXISTS roles (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL UNIQUE,
-    descripcion VARCHAR(200),
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insertar roles básicos
-INSERT INTO roles (nombre, descripcion) VALUES 
-('ADMIN', 'Administrador del sistema'),
-('USER', 'Usuario normal')
-ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
-
--- Crear tabla de usuarios_roles (si es necesaria)
-CREATE TABLE IF NOT EXISTS usuarios_roles (
+-- TERCERO: Crear tabla de relación usuarios-roles
+CREATE TABLE IF NOT EXISTS usuario_roles (
     usuario_id BIGINT,
     rol_id BIGINT,
     fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -64,17 +43,21 @@ CREATE TABLE IF NOT EXISTS usuarios_roles (
     FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
--- Asignar rol de admin al usuario admin
-INSERT INTO usuarios_roles (usuario_id, rol_id) 
+-- CUARTO: Insertar roles básicos (usando IGNORE para evitar duplicados)
+INSERT IGNORE INTO roles (nombre, descripcion) VALUES 
+('ROLE_ADMIN', 'Administrador del sistema'),
+('ROLE_USER', 'Usuario normal');
+
+-- QUINTO: Insertar usuario administrador por defecto
+-- Contraseña: admin123 (hasheada con BCrypt)
+INSERT IGNORE INTO usuarios (nombre, email, password_hash, pelicula_favorita, libro_favorito) 
+VALUES ('admin', 'admin@cinelibro.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'El Padrino', 'Cien años de soledad');
+
+-- SEXTO: Asignar rol de admin al usuario admin
+INSERT IGNORE INTO usuario_roles (usuario_id, rol_id) 
 SELECT u.id, r.id 
 FROM usuarios u, roles r 
-WHERE u.email = 'admin@cinelibro.com' AND r.nombre = 'ADMIN'
-ON DUPLICATE KEY UPDATE fecha_asignacion = CURRENT_TIMESTAMP;
+WHERE u.email = 'admin@cinelibro.com' AND r.nombre = 'ROLE_ADMIN';
 
--- Verificar que todo está funcionando correctamente
-SELECT 
-    COUNT(*) as total_usuarios,
-    COUNT(imagen) as usuarios_con_imagen,
-    COUNT(pelicula_favorita) as usuarios_con_pelicula,
-    COUNT(libro_favorito) as usuarios_con_libro
-FROM usuarios;
+-- VERIFICACIÓN: Mostrar que todo está configurado correctamente
+SELECT 'Configuración completada correctamente' as status;

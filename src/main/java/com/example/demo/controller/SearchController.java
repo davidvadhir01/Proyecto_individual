@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -22,12 +21,13 @@ public class SearchController {
     private BookService bookService;
 
     /**
-     * Página de búsqueda de películas
+     * ✅ CORREGIDO: Página de búsqueda de películas
      */
     @GetMapping("/peliculas")
     public String buscarPeliculas(@RequestParam(required = false) String query, Model model) {
         model.addAttribute("searchType", "peliculas");
         model.addAttribute("pageTitle", "Buscar Películas");
+        model.addAttribute("searchPlaceholder", "Buscar películas... (ej: Avengers, Batman)");
         
         if (query != null && !query.trim().isEmpty()) {
             try {
@@ -38,6 +38,8 @@ public class SearchController {
                 
                 if (peliculas.isEmpty()) {
                     model.addAttribute("mensaje", "No se encontraron películas para: " + query);
+                } else {
+                    model.addAttribute("mensaje", "Se encontraron " + peliculas.size() + " películas para: " + query);
                 }
             } catch (Exception e) {
                 model.addAttribute("error", "Error al buscar películas: " + e.getMessage());
@@ -49,12 +51,13 @@ public class SearchController {
     }
 
     /**
-     * Página de búsqueda de libros
+     * ✅ CORREGIDO: Página de búsqueda de libros
      */
     @GetMapping("/libros")
     public String buscarLibros(@RequestParam(required = false) String query, Model model) {
         model.addAttribute("searchType", "libros");
         model.addAttribute("pageTitle", "Buscar Libros");
+        model.addAttribute("searchPlaceholder", "Buscar libros... (ej: Harry Potter, Cien años)");
         
         if (query != null && !query.trim().isEmpty()) {
             try {
@@ -65,6 +68,8 @@ public class SearchController {
                 
                 if (libros.isEmpty()) {
                     model.addAttribute("mensaje", "No se encontraron libros para: " + query);
+                } else {
+                    model.addAttribute("mensaje", "Se encontraron " + libros.size() + " libros para: " + query);
                 }
             } catch (Exception e) {
                 model.addAttribute("error", "Error al buscar libros: " + e.getMessage());
@@ -87,14 +92,16 @@ public class SearchController {
                 "success", true,
                 "data", peliculas,
                 "total", peliculas.size(),
-                "query", query
+                "query", query,
+                "type", "peliculas"
             );
         } catch (Exception e) {
             System.err.println("Error en API de películas: " + e.getMessage());
             return Map.of(
                 "success", false,
                 "error", e.getMessage(),
-                "query", query
+                "query", query,
+                "type", "peliculas"
             );
         }
     }
@@ -111,14 +118,16 @@ public class SearchController {
                 "success", true,
                 "data", libros,
                 "total", libros.size(),
-                "query", query
+                "query", query,
+                "type", "libros"
             );
         } catch (Exception e) {
             System.err.println("Error en API de libros: " + e.getMessage());
             return Map.of(
                 "success", false,
                 "error", e.getMessage(),
-                "query", query
+                "query", query,
+                "type", "libros"
             );
         }
     }
@@ -131,10 +140,10 @@ public class SearchController {
     public Map<String, Object> obtenerDetallesPelicula(@PathVariable String id) {
         try {
             Map<String, Object> detalles = movieService.obtenerDetallesPelicula(id);
-            return Map.of("success", true, "data", detalles);
+            return Map.of("success", true, "data", detalles, "type", "pelicula");
         } catch (Exception e) {
             System.err.println("Error obteniendo detalles de película: " + e.getMessage());
-            return Map.of("success", false, "error", e.getMessage());
+            return Map.of("success", false, "error", e.getMessage(), "type", "pelicula");
         }
     }
     
@@ -146,10 +155,10 @@ public class SearchController {
     public Map<String, Object> obtenerDetallesLibro(@PathVariable String id) {
         try {
             Map<String, Object> detalles = bookService.obtenerDetallesLibro(id);
-            return Map.of("success", true, "data", detalles);
+            return Map.of("success", true, "data", detalles, "type", "libro");
         } catch (Exception e) {
             System.err.println("Error obteniendo detalles de libro: " + e.getMessage());
-            return Map.of("success", false, "error", e.getMessage());
+            return Map.of("success", false, "error", e.getMessage(), "type", "libro");
         }
     }
 }
