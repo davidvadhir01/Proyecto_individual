@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinéLibro - Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --book-brown: #8B4513;
+            --book-gold: #D4AF37;
+            --cinema-red: #DC3545;
+            --cinema-black: #121212;
+            --parchment: #F5F5DC;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        
+        .register-card {
+            background-color: rgba(33, 33, 33, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            width: 450px;
+            max-width: 90%;
+            padding: 0;
+        }
+        
+        .card-header {
+            background-color: var(--book-brown);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--book-gold);
+        }
+        
+        .card-header h2 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            color: var(--book-gold);
+            font-weight: 700;
+            font-size: 2.2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+            }
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-top: 5px;
+            color: #fff;
+            font-weight: 300;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: none;
+            border-bottom: 2px solid var(--book-gold);
+            border-radius: 0;
+            color: white;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: var(--cinema-red);
+            box-shadow: none;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-label {
+            color: var(--book-gold);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 8px;
+        }
+        
+        .form-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+        
+        .btn-register {
+            background-color: var(--cinema-red);
+            border: none;
+            padding: 12px 20px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            color: white;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-register:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-register:hover {
+            background-color: var(--book-brown);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-register:hover:after {
+            left: 100%;
+        }
+        
+        .card-footer {
+            background-color: rgba(20, 20, 20, 0.8);
+            padding: 15px 25px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-footer a {
+            color: var(--book-gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .card-footer a:hover {
+            color: var(--cinema-red);
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-radius: 0;
+            margin-bottom: 20px;
+        }
+        
+        .text-danger {
+            color: var(--cinema-red) !important;
+        }
+        
+        .register-decor {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .register-decor::before {
+            content: '📚';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .register-decor::after {
+            content: '🎬';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Animación para la tarjeta */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .register-card {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        /* Elementos decorativos flotantes */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .element {
+            position: absolute;
+            opacity: 0.6;
+            animation: float 15s infinite linear;
+        }
+        
+        .element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-duration: 25s;
+            animation-delay: 0s;
+        }
+        
+        .element:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-duration: 18s;
+            animation-delay: 2s;
+        }
+        
+        .element:nth-child(3) {
+            bottom: 15%;
+            left: 15%;
+            animation-duration: 20s;
+            animation-delay: 5s;
+        }
+        
+        .element:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-duration: 22s;
+            animation-delay: 7s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos decorativos flotantes -->
+    <div class="floating-elements">
+        <div class="element">📖</div>
+        <div class="element">🎞️</div>
+        <div class="element">🎭</div>
+        <div class="element">📽️</div>
+    </div>
+
+    <div class="register-container">
+        <div class="register-card">
+            <div class="card-header">
+                <h2>CinéLibro</h2>
+                <p class="tagline">Únete a nuestra comunidad de historias</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Mensajes de éxito o error -->
+                <div th:if="${param.success}" class="alert alert-success" role="alert">
+                    ¡Registro exitoso! Ahora puedes iniciar sesión.
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}">Error en el registro. Por favor, intenta nuevamente.</span>
+                </div>
+                
+                <!-- Formulario de registro -->
+                <form th:action="@{/usuarios/registrar}" method="post" th:object="${usuario}">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">
+                            <i>👤</i> Nombre completo
+                        </label>
+                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" placeholder="Tu nombre completo" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i>✉️</i> Email
+                        </label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="tu@email.com" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passwordHash" class="form-label">
+                            <i>🔒</i> Contraseña
+                        </label>
+                        <input type="password" class="form-control" id="passwordHash" th:field="*{passwordHash}" placeholder="Tu contraseña" required>
+                        <div class="form-text">La contraseña debe tener al menos 5 caracteres.</div>
+                        <div class="text-danger" th:if="${#fields.hasErrors('passwordHash')}" th:errors="*{passwordHash}"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">
+                            <i>🔒</i> Confirmar contraseña
+                        </label>
+                        <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirma tu contraseña" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                    </div>
+                    
+                    <div class="register-decor">
+                        <button type="submit" class="btn btn-register">Crear cuenta</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card-footer">
+                <p class="mb-0">¿Ya tienes cuenta? <a href="/login" class="text-decoration-none">Iniciar sesión</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

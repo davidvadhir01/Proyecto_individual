@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql1
+    restart: always
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M
+      --max-connections=200
+      --skip-host-cache
+      --skip-name-resolve
+      --innodb-use-native-aio=0
+      --innodb-flush-method=fsync
+    environment:
+      MYSQL_DATABASE: tarea2
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 120s
+
+  app:
+    build: .
+    container_name: springboot-app1
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/tarea2?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false&maxReconnects=10"
+      SPRING_DATASOURCE_USERNAME: "admin"
+      SPRING_DATASOURCE_PASSWORD: "admin"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+      # Configuraciones adicionales para reconexión
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "30000"
+      SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT: "5000"
+      SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: "1800000"
+      SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: "60000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

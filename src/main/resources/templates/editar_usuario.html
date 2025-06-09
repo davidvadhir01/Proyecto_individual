@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinéLibro - Editar Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --book-brown: #8B4513;
+            --book-gold: #D4AF37;
+            --cinema-red: #DC3545;
+            --cinema-black: #121212;
+            --admin-purple: #6f42c1;
+            --admin-blue: #0d6efd;
+            --admin-green: #198754;
+            --parchment: #F5F5DC;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                        url('https://images.unsplash.com/photo-1512070679279-8988d32161be?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .edit-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .edit-card {
+            background-color: rgba(33, 33, 33, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            background-color: var(--admin-purple);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--book-gold);
+            position: relative;
+        }
+        
+        .card-header h2 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            color: var(--book-gold);
+            font-weight: 700;
+            font-size: 2.2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+            }
+        }
+        
+        .admin-badge {
+            background-color: var(--book-gold);
+            color: var(--admin-purple);
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(0, 0, 0, 0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            color: var(--book-gold);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .form-label i {
+            margin-right: 8px;
+        }
+        
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-bottom: 2px solid var(--book-gold);
+            border-radius: 0;
+            color: white;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--admin-blue);
+            box-shadow: none;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .btn-action {
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            margin-right: 10px;
+        }
+        
+        .btn-save {
+            background-color: var(--admin-green);
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background-color: #157347;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-cancel {
+            background-color: var(--cinema-red);
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #bb2d3b;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-icon {
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-left: 4px solid var(--admin-blue);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .user-info h4 {
+            color: var(--book-gold);
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Animación para la tarjeta */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .edit-card {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        /* Elementos decorativos flotantes */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .element {
+            position: absolute;
+            opacity: 0.2;
+            animation: float 15s infinite linear;
+            font-size: 1.5rem;
+        }
+        
+        .element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-duration: 25s;
+            animation-delay: 0s;
+        }
+        
+        .element:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-duration: 18s;
+            animation-delay: 2s;
+        }
+        
+        .element:nth-child(3) {
+            bottom: 15%;
+            left: 15%;
+            animation-duration: 20s;
+            animation-delay: 5s;
+        }
+        
+        .element:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-duration: 22s;
+            animation-delay: 7s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos decorativos flotantes -->
+    <div class="floating-elements">
+        <div class="element">📖</div>
+        <div class="element">🎞️</div>
+        <div class="element">🎭</div>
+        <div class="element">📽️</div>
+    </div>
+
+    <div class="edit-container">
+        <div class="edit-card">
+            <div class="card-header">
+                <a href="/admin/usuarios" class="back-button">←</a>
+                <h2>CinéLibro</h2>
+                <div class="admin-badge">Editar Usuario</div>
+            </div>
+            
+            <div class="card-body">
+                <div class="user-info">
+                    <h4>Editando perfil de usuario</h4>
+                    <p>Actualiza la información del usuario según sea necesario. La contraseña se actualizará solo si se ingresa una nueva.</p>
+                </div>
+                
+                <form th:action="@{/admin/usuarios/editar/{id}(id=${usuario.id})}" method="post">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">
+                            <i>👤</i> Nombre completo
+                        </label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               th:value="${usuario.nombre}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i>✉️</i> Email
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               th:value="${usuario.email}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i>🔒</i> Nueva Contraseña
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password">
+                        <div class="form-text">Deja en blanco para mantener la contraseña actual</div>
+                    </div>
+                    
+                    <div class="d-flex mt-4">
+                        <button type="submit" class="btn-action btn-save">
+                            <span class="btn-icon">💾</span>
+                            <span>Guardar Cambios</span>
+                        </button>
+                        
+                        <a href="/admin/usuarios" class="btn-action btn-cancel">
+                            <span class="btn-icon">✖️</span>
+                            <span>Cancelar</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+Last edited just now
