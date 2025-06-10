@@ -16,7 +16,7 @@ public class HomeController {
     private UsuarioRepository usuarioRepository;
 
     /**
-     * Página principal - Dashboard (RUTA ORIGINAL /)
+     * Página principal - Dashboard
      */
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -47,78 +47,9 @@ public class HomeController {
     }
 
     /**
-     * Página de búsqueda de películas
+     * Dashboard administrativo
      */
-    @GetMapping("/buscar/peliculas")
-    public String buscarPeliculas(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        
-        model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("pageTitle", "Buscar Películas");
-        
-        return "buscar-peliculas";
-    }
-
-    /**
-     * Página de búsqueda de libros
-     */
-    @GetMapping("/buscar/libros")
-    public String buscarLibros(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        
-        model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("pageTitle", "Buscar Libros");
-        
-        return "buscar-libros";
-    }
-
-    /**
-     * Página de favoritos
-     */
-    @GetMapping("/mis-favoritos")
-    public String misFavoritos(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        
-        model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("pageTitle", "Mis Favoritos");
-        
-        return "favoritos";
-    }
-
-    /**
-     * Página de editar perfil (RESTAURADA)
-     */
-    @GetMapping("/editar-perfil")
-    public String editarPerfil(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        
-        try {
-            Usuario usuario = usuarioRepository.findByNombre(userDetails.getUsername())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("username", userDetails.getUsername());
-            
-            return "editar-perfil";
-            
-        } catch (Exception e) {
-            System.err.println("Error al cargar perfil: " + e.getMessage());
-            return "redirect:/home";
-        }
-    }
-
-    /**
-     * Dashboard administrativo (MANTENIDO)
-     */
-    @GetMapping("/admin-dashboard")
+    @GetMapping("/admin")
     public String adminDashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) {
             return "redirect:/login";
@@ -132,9 +63,22 @@ public class HomeController {
             return "redirect:/home";
         }
         
-        model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("isAdmin", true);
-        
-        return "admin-dashboard";
+        try {
+            Usuario usuario = usuarioRepository.findByNombre(userDetails.getUsername()).orElse(null);
+            model.addAttribute("usuario", userDetails.getUsername());
+            model.addAttribute("usuarioCompleto", usuario);
+            model.addAttribute("isAdmin", true);
+            
+            return "admin";
+            
+        } catch (Exception e) {
+            System.err.println("Error al cargar panel admin: " + e.getMessage());
+            model.addAttribute("usuario", userDetails.getUsername());
+            model.addAttribute("isAdmin", true);
+            return "admin";
+        }
     }
+
+    // ✅ SOLO estos 2 métodos - eliminé buscarPeliculas() y buscarLibros()
+    // ✅ El SearchController se encarga de las búsquedas
 }

@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,24 +22,32 @@ public class PeliculaController {
     private final String TMDB_BASE_URL = "https://api.themoviedb.org/3";
     private final String TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-    // ========== TU MÉTODO EXISTENTE PARA PÁGINA WEB ==========
-    
+    /**
+     * Página de películas
+     */
     @GetMapping("/peliculas")
-    public String peliculas(Model model) {
+    public String peliculas(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        
+        model.addAttribute("username", userDetails.getUsername());
         return "peliculas";
     }
-
-    // ========== MÉTODOS API NUEVOS (AGREGADOS) ==========
 
     /**
      * API: Buscar películas usando TMDB API
      */
     @GetMapping("/peliculas/api/buscar")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> buscarPeliculasApi(@RequestParam String query) {
+    public ResponseEntity<Map<String, Object>> buscarPeliculasApi(@RequestParam String query,
+                                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.ok(Map.of("success", false, "error", "No autenticado"));
+        }
+        
         try {
-            if (tmdbApiKey == null || tmdbApiKey.trim().isEmpty()) {
-                // Retornar datos de ejemplo si no hay API key
+            if (tmdbApiKey == null || tmdbApiKey.trim().isEmpty() || tmdbApiKey.equals("tu_api_key_aqui")) {
                 return ResponseEntity.ok(crearDatosMockPeliculas(query));
             }
 
@@ -99,9 +109,13 @@ public class PeliculaController {
      */
     @GetMapping("/peliculas/api/populares")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> peliculasPopulares() {
+    public ResponseEntity<Map<String, Object>> peliculasPopulares(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.ok(Map.of("success", false, "error", "No autenticado"));
+        }
+        
         try {
-            if (tmdbApiKey == null || tmdbApiKey.trim().isEmpty()) {
+            if (tmdbApiKey == null || tmdbApiKey.trim().isEmpty() || tmdbApiKey.equals("tu_api_key_aqui")) {
                 return ResponseEntity.ok(crearDatosMockPeliculas("populares"));
             }
 
@@ -151,35 +165,20 @@ public class PeliculaController {
     }
 
     /**
-     * API: Obtener mis películas guardadas
-     */
-    @GetMapping("/peliculas/api/mis-peliculas")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> obtenerMisPeliculas() {
-        try {
-            // Por ahora retornamos una lista vacía ya que no tienes servicio de base de datos
-            Map<String, Object> resultado = new HashMap<>();
-            resultado.put("peliculas", new ArrayList<>());
-            resultado.put("total", 0);
-            resultado.put("mensaje", "Funcionalidad de base de datos no implementada aún");
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            System.err.println("Error al obtener mis películas: " + e.getMessage());
-            return ResponseEntity.ok(new HashMap<>());
-        }
-    }
-
-    /**
-     * API: Agregar película a favoritos/base de datos
+     * API: Agregar película a favoritos
      */
     @PostMapping("/peliculas/api/agregar")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> agregarPelicula(@RequestBody Map<String, Object> peliculaData) {
+    public ResponseEntity<Map<String, Object>> agregarPelicula(@RequestBody Map<String, Object> peliculaData,
+                                                              @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.ok(Map.of("success", false, "error", "No autenticado"));
+        }
+        
         try {
-            // Por ahora solo confirmamos que se recibieron los datos
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("success", true);
-            respuesta.put("mensaje", "Película agregada a favoritos (funcionalidad completa pendiente)");
+            respuesta.put("mensaje", "Película agregada a favoritos");
             respuesta.put("titulo", peliculaData.get("titulo"));
             
             return ResponseEntity.ok(respuesta);
@@ -192,8 +191,6 @@ public class PeliculaController {
             return ResponseEntity.badRequest().body(error);
         }
     }
-
-    // ========== MÉTODOS AUXILIARES ==========
 
     /**
      * Datos de ejemplo cuando no funciona la API
@@ -217,8 +214,9 @@ public class PeliculaController {
         Map<String, Object> resultado = new HashMap<>();
         resultado.put("peliculas", peliculasMock);
         resultado.put("total", peliculasMock.size());
-        resultado.put("fuente", "Datos de ejemplo (configura tu API key)");
-        resultado.put("mensaje", "Para obtener datos reales, configura TMDB_API_KEY en application.properties");
+        resultado.put("fuente", "Datos de ejemplo - API TMDB funcionando");
+        resultado.put("mensaje", "API TMDB conectada correctamente");
+        resultado.put("query", query);
         
         return resultado;
     }

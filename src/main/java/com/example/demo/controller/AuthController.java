@@ -23,19 +23,20 @@ public class AuthController {
     public String login() {
         return "login";
     }
-    // En tu AuthController.java, agrega:
-@GetMapping("/forgot-password")
-public String mostrarFormularioRecuperacion() {
-    return "forgot_password"; // Crear esta plantilla
-}
+    
+    // Formulario de recuperación de contraseña
+    @GetMapping("/forgot-password")
+    public String mostrarFormularioRecuperacion() {
+        return "forgot_password"; // Crear esta plantilla si es necesario
+    }
 
-// Método para procesar solicitudes de recuperación de contraseña
-@PostMapping("/forgot-password")
-public String procesarRecuperacionContrasena(@RequestParam String email, RedirectAttributes redirectAttributes) {
-    // Lógica para enviar correo de recuperación
-    redirectAttributes.addFlashAttribute("success", "Te hemos enviado un correo con instrucciones para restablecer tu contraseña.");
-    return "redirect:/login";
-}
+    // Método para procesar solicitudes de recuperación de contraseña
+    @PostMapping("/forgot-password")
+    public String procesarRecuperacionContrasena(@RequestParam String email, RedirectAttributes redirectAttributes) {
+        // Lógica para enviar correo de recuperación
+        redirectAttributes.addFlashAttribute("success", "Te hemos enviado un correo con instrucciones para restablecer tu contraseña.");
+        return "redirect:/login";
+    }
 
     // Muestra la página de registro y añade el modelo necesario
     @GetMapping("/registro")
@@ -43,7 +44,6 @@ public String procesarRecuperacionContrasena(@RequestParam String email, Redirec
         model.addAttribute("usuario", new Regis());
         return "registro";
     }
-    
     
     // Muestra la página principal después del login
     @GetMapping("/dashboard")

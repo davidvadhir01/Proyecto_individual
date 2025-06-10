@@ -1,4 +1,4 @@
-package  com.example.demo;
+package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,11 +8,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
-    " com.example.demo.config",
-    " com.example.demo.controller",
+    "com.example.demo.config",
+    "com.example.demo.controller",
     "com.example.demo.entity",
-    " com.example.demo.repository",
-    " com.example.demo.service",
+    "com.example.demo.repository",
+    "com.example.demo.service",
     "com.example.demo.SistemaAutenticacion"
 })
 @EnableJpaRepositories(basePackages = "com.example.demo.repository")

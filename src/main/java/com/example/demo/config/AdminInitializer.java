@@ -24,7 +24,7 @@ public class AdminInitializer implements CommandLineRunner {
     @Autowired
     private RolRepository rolRepository;
     
-    // Creamos el passwordEncoder directamente en lugar de inyectarlo
+    // Creamos el passwordEncoder directamente
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     
     @Override
@@ -32,9 +32,9 @@ public class AdminInitializer implements CommandLineRunner {
         System.out.println("🚀 Iniciando AdminInitializer...");
         
         try {
-            // ✅ PASO 1: Verificar y crear roles si no existen
-            Rol adminRol = crearRolSiNoExiste("ROLE_ADMIN", "Administrador del sistema");
-            Rol userRol = crearRolSiNoExiste("ROLE_USER", "Usuario normal");
+            // ✅ PASO 1: Crear roles si no existen
+            Rol adminRol = crearRolSiNoExiste("ROLE_ADMIN");
+            Rol userRol = crearRolSiNoExiste("ROLE_USER");
             
             // ✅ PASO 2: Verificar si ya existe un administrador
             long adminCount = usuarioRepository.countByRolesNombre("ROLE_ADMIN");
@@ -53,30 +53,27 @@ public class AdminInitializer implements CommandLineRunner {
                 admin.setRoles(new HashSet<>(Collections.singletonList(adminRol)));
                 
                 Usuario savedAdmin = usuarioRepository.save(admin);
-                System.out.println("✅ Usuario administrador creado exitosamente con ID: " + savedAdmin.getId());
+                System.out.println("✅ Usuario administrador creado exitosamente!");
                 System.out.println("📧 Email: " + savedAdmin.getEmail());
+                System.out.println("🔑 Usuario: admin");
                 System.out.println("🔑 Contraseña: admin123");
                 
             } else {
-                System.out.println("✅ Usuario administrador ya existe, saltando creación");
+                System.out.println("✅ Usuario administrador ya existe");
             }
             
-            // ✅ PASO 4: Verificar configuración final
+            // ✅ PASO 4: Verificar configuración
             verificarConfiguracion();
             
         } catch (Exception e) {
             System.err.println("❌ Error en AdminInitializer: " + e.getMessage());
             e.printStackTrace();
-            // No lanzamos la excepción para que no impida el inicio de la aplicación
         }
         
         System.out.println("🏁 AdminInitializer completado");
     }
     
-    /**
-     * Crea un rol si no existe
-     */
-    private Rol crearRolSiNoExiste(String nombreRol, String descripcion) {
+    private Rol crearRolSiNoExiste(String nombreRol) {
         Optional<Rol> rolExistente = rolRepository.findByNombre(nombreRol);
         
         if (rolExistente.isPresent()) {
@@ -86,16 +83,6 @@ public class AdminInitializer implements CommandLineRunner {
             System.out.println("🆕 Creando rol: " + nombreRol);
             Rol nuevoRol = new Rol();
             nuevoRol.setNombre(nombreRol);
-            // Solo establecer descripción si el setter existe
-            try {
-                // Verificamos si el método setDescripcion existe
-                nuevoRol.getClass().getMethod("setDescripcion", String.class);
-                // Si existe, lo llamamos usando reflexión para evitar errores de compilación
-                nuevoRol.getClass().getMethod("setDescripcion", String.class).invoke(nuevoRol, descripcion);
-            } catch (Exception e) {
-                // Si no existe el método, simplemente continuamos sin descripción
-                System.out.println("ℹ️ Rol sin campo descripción");
-            }
             
             Rol savedRol = rolRepository.save(nuevoRol);
             System.out.println("✅ Rol '" + nombreRol + "' creado con ID: " + savedRol.getId());
@@ -103,9 +90,6 @@ public class AdminInitializer implements CommandLineRunner {
         }
     }
     
-    /**
-     * Verifica que la configuración esté correcta
-     */
     private void verificarConfiguracion() {
         try {
             long totalUsuarios = usuarioRepository.count();
@@ -119,6 +103,8 @@ public class AdminInitializer implements CommandLineRunner {
             
             if (totalAdmins > 0) {
                 System.out.println("✅ Sistema configurado correctamente");
+                System.out.println("🌐 Accede a: http://localhost:8080");
+                System.out.println("👤 Usuario: admin | 🔑 Contraseña: admin123");
             } else {
                 System.out.println("⚠️ Advertencia: No hay administradores en el sistema");
             }

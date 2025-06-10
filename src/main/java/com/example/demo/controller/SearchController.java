@@ -1,8 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Usuario;
+import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.service.MovieService;
 import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/buscar")
 public class SearchController {
 
     @Autowired
@@ -19,27 +22,55 @@ public class SearchController {
     
     @Autowired
     private BookService bookService;
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     /**
-     * ✅ CORREGIDO: Página de búsqueda de películas
+     * Búsqueda de películas - USA TU PLANTILLA buscar.html
      */
-    @GetMapping("/peliculas")
-    public String buscarPeliculas(@RequestParam(required = false) String query, Model model) {
+    @GetMapping("/buscar/peliculas")
+    public String buscarPeliculas(
+            @RequestParam(required = false) String query, 
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+        
+        // Verificar autenticación
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        
+        // Cargar datos del usuario para mantener sesión
+        try {
+            Usuario usuario = usuarioRepository.findByNombre(userDetails.getUsername()).orElse(null);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("username", userDetails.getUsername());
+            
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+            model.addAttribute("isAdmin", isAdmin);
+        } catch (Exception e) {
+            System.err.println("Error cargando usuario: " + e.getMessage());
+            model.addAttribute("username", userDetails.getUsername());
+            model.addAttribute("isAdmin", false);
+        }
+        
+        // Configurar para películas
         model.addAttribute("searchType", "peliculas");
         model.addAttribute("pageTitle", "Buscar Películas");
-        model.addAttribute("searchPlaceholder", "Buscar películas... (ej: Avengers, Batman)");
+        model.addAttribute("searchPlaceholder", "Buscar películas...");
         
+        // Realizar búsqueda si hay query
         if (query != null && !query.trim().isEmpty()) {
             try {
                 List<Map<String, Object>> peliculas = movieService.buscarPeliculas(query);
                 model.addAttribute("resultados", peliculas);
                 model.addAttribute("query", query);
-                model.addAttribute("totalResultados", peliculas.size());
                 
                 if (peliculas.isEmpty()) {
                     model.addAttribute("mensaje", "No se encontraron películas para: " + query);
                 } else {
-                    model.addAttribute("mensaje", "Se encontraron " + peliculas.size() + " películas para: " + query);
+                    model.addAttribute("mensaje", "Se encontraron " + peliculas.size() + " películas");
                 }
             } catch (Exception e) {
                 model.addAttribute("error", "Error al buscar películas: " + e.getMessage());
@@ -47,29 +78,54 @@ public class SearchController {
             }
         }
         
-        return "buscar";
+        return "buscar"; // TU plantilla existente
     }
 
     /**
-     * ✅ CORREGIDO: Página de búsqueda de libros
+     * Búsqueda de libros - USA TU PLANTILLA buscar.html
      */
-    @GetMapping("/libros")
-    public String buscarLibros(@RequestParam(required = false) String query, Model model) {
+    @GetMapping("/buscar/libros")
+    public String buscarLibros(
+            @RequestParam(required = false) String query, 
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+        
+        // Verificar autenticación
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        
+        // Cargar datos del usuario para mantener sesión
+        try {
+            Usuario usuario = usuarioRepository.findByNombre(userDetails.getUsername()).orElse(null);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("username", userDetails.getUsername());
+            
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+            model.addAttribute("isAdmin", isAdmin);
+        } catch (Exception e) {
+            System.err.println("Error cargando usuario: " + e.getMessage());
+            model.addAttribute("username", userDetails.getUsername());
+            model.addAttribute("isAdmin", false);
+        }
+        
+        // Configurar para libros
         model.addAttribute("searchType", "libros");
         model.addAttribute("pageTitle", "Buscar Libros");
-        model.addAttribute("searchPlaceholder", "Buscar libros... (ej: Harry Potter, Cien años)");
+        model.addAttribute("searchPlaceholder", "Buscar libros...");
         
+        // Realizar búsqueda si hay query
         if (query != null && !query.trim().isEmpty()) {
             try {
                 List<Map<String, Object>> libros = bookService.buscarLibros(query);
                 model.addAttribute("resultados", libros);
                 model.addAttribute("query", query);
-                model.addAttribute("totalResultados", libros.size());
                 
                 if (libros.isEmpty()) {
                     model.addAttribute("mensaje", "No se encontraron libros para: " + query);
                 } else {
-                    model.addAttribute("mensaje", "Se encontraron " + libros.size() + " libros para: " + query);
+                    model.addAttribute("mensaje", "Se encontraron " + libros.size() + " libros");
                 }
             } catch (Exception e) {
                 model.addAttribute("error", "Error al buscar libros: " + e.getMessage());
@@ -77,13 +133,13 @@ public class SearchController {
             }
         }
         
-        return "buscar";
+        return "buscar"; // TU plantilla existente
     }
     
     /**
-     * API endpoint para búsqueda de películas (AJAX)
+     * API endpoints para AJAX
      */
-    @GetMapping("/api/peliculas")
+    @GetMapping("/api/search/peliculas")
     @ResponseBody
     public Map<String, Object> buscarPeliculasApi(@RequestParam String query) {
         try {
@@ -91,25 +147,14 @@ public class SearchController {
             return Map.of(
                 "success", true,
                 "data", peliculas,
-                "total", peliculas.size(),
-                "query", query,
-                "type", "peliculas"
+                "total", peliculas.size()
             );
         } catch (Exception e) {
-            System.err.println("Error en API de películas: " + e.getMessage());
-            return Map.of(
-                "success", false,
-                "error", e.getMessage(),
-                "query", query,
-                "type", "peliculas"
-            );
+            return Map.of("success", false, "error", e.getMessage());
         }
     }
     
-    /**
-     * API endpoint para búsqueda de libros (AJAX)
-     */
-    @GetMapping("/api/libros")
+    @GetMapping("/api/search/libros")
     @ResponseBody
     public Map<String, Object> buscarLibrosApi(@RequestParam String query) {
         try {
@@ -117,48 +162,10 @@ public class SearchController {
             return Map.of(
                 "success", true,
                 "data", libros,
-                "total", libros.size(),
-                "query", query,
-                "type", "libros"
+                "total", libros.size()
             );
         } catch (Exception e) {
-            System.err.println("Error en API de libros: " + e.getMessage());
-            return Map.of(
-                "success", false,
-                "error", e.getMessage(),
-                "query", query,
-                "type", "libros"
-            );
-        }
-    }
-    
-    /**
-     * Obtener detalles de una película específica
-     */
-    @GetMapping("/pelicula/{id}")
-    @ResponseBody
-    public Map<String, Object> obtenerDetallesPelicula(@PathVariable String id) {
-        try {
-            Map<String, Object> detalles = movieService.obtenerDetallesPelicula(id);
-            return Map.of("success", true, "data", detalles, "type", "pelicula");
-        } catch (Exception e) {
-            System.err.println("Error obteniendo detalles de película: " + e.getMessage());
-            return Map.of("success", false, "error", e.getMessage(), "type", "pelicula");
-        }
-    }
-    
-    /**
-     * Obtener detalles de un libro específico
-     */
-    @GetMapping("/libro/{id}")
-    @ResponseBody
-    public Map<String, Object> obtenerDetallesLibro(@PathVariable String id) {
-        try {
-            Map<String, Object> detalles = bookService.obtenerDetallesLibro(id);
-            return Map.of("success", true, "data", detalles, "type", "libro");
-        } catch (Exception e) {
-            System.err.println("Error obteniendo detalles de libro: " + e.getMessage());
-            return Map.of("success", false, "error", e.getMessage(), "type", "libro");
+            return Map.of("success", false, "error", e.getMessage());
         }
     }
 }

@@ -3,536 +3,412 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle} ?: 'Buscar Contenido'">Buscar Contenido</title>
-    
-    <!-- Bootstrap CSS -->
+    <title th:text="'CinéLibro - ' + ${pageTitle}">CinéLibro - Buscar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6366f1;
-            --secondary-color: #8b5cf6;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --dark-color: #1f2937;
-            --light-color: #f8fafc;
-            --border-radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --book-brown: #8B4513;
+            --book-gold: #D4AF37;
+            --cinema-red: #DC3545;
+            --cinema-black: #121212;
+            --parchment: #F5F5DC;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
             min-height: 100vh;
-            color: var(--dark-color);
+            color: white;
         }
-
-        .main-container {
+        
+        .search-container {
             min-height: 100vh;
-            padding: 2rem 0;
+            padding: 40px 0;
         }
-
-        .search-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
+        
+        .header-section {
+            background-color: rgba(33, 33, 33, 0.95);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
-
-        .search-title {
+        
+        .page-title {
+            font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
-
-        .search-subtitle {
-            color: #6b7280;
+        
+        /* Colores dinámicos según el tipo de búsqueda */
+        .page-title.peliculas {
+            color: var(--cinema-red);
+        }
+        
+        .page-title.libros {
+            color: var(--book-brown);
+        }
+        
+        .page-subtitle {
+            text-align: center;
+            color: var(--book-gold);
             font-size: 1.1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 25px;
         }
-
+        
         .search-form {
-            max-width: 600px;
-            margin: 0 auto;
+            background-color: rgba(139, 69, 19, 0.2);
+            border: 2px solid var(--book-gold);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
         }
-
-        .search-input-group {
-            position: relative;
-            margin-bottom: 1rem;
-        }
-
+        
         .search-input {
             width: 100%;
-            padding: 1rem 1rem 1rem 3.5rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            border: 2px solid var(--book-gold);
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
             font-size: 1.1rem;
             transition: all 0.3s ease;
-            background: white;
+            margin-bottom: 15px;
         }
-
+        
         .search-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background-color: rgba(0, 0, 0, 0.9);
         }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 1.2rem;
+        
+        .search-input.peliculas:focus {
+            border-color: var(--cinema-red);
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
         }
-
-        .search-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        
+        .search-input.libros:focus {
+            border-color: var(--book-brown);
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .search-button {
             border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
             color: white;
-            padding: 1rem 2rem;
-            border-radius: var(--border-radius);
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            margin-top: 1rem;
         }
-
-        .search-btn:hover {
+        
+        .search-button.peliculas {
+            background: linear-gradient(45deg, var(--cinema-red), #bd2130);
+        }
+        
+        .search-button.libros {
+            background: linear-gradient(45deg, var(--book-brown), #6d3610);
+        }
+        
+        .search-button:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
         }
-
-        .navigation-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .nav-tab {
+        
+        .back-button {
+            background: linear-gradient(45deg, var(--book-gold), #c39b2b);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            color: var(--cinema-black);
             text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark-color);
             font-weight: 500;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
+            display: inline-block;
+            margin-bottom: 20px;
         }
-
-        .nav-tab:hover {
-            background: white;
+        
+        .back-button:hover {
+            background: linear-gradient(45deg, #c39b2b, var(--book-gold));
+            color: var(--cinema-black);
             transform: translateY(-2px);
-            text-decoration: none;
-            color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
-
-        .nav-tab.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        
+        .results-section {
+            background-color: rgba(33, 33, 33, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
-
-        .results-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
+        
+        .results-header {
+            border-bottom: 2px solid var(--book-gold);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
         }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+        
+        .results-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--book-gold);
+            font-size: 1.8rem;
+            margin: 0;
         }
-
+        
+        .results-count {
+            font-weight: 500;
+            margin-top: 5px;
+        }
+        
+        .results-count.peliculas {
+            color: var(--cinema-red);
+        }
+        
+        .results-count.libros {
+            color: var(--book-brown);
+        }
+        
         .result-card {
-            background: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--book-gold);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
-        }
-
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .result-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            background: #f3f4f6;
-        }
-
-        .result-content {
-            padding: 1.5rem;
-        }
-
-        .result-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--dark-color);
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-
-        .result-info {
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-description {
-            color: #4b5563;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 1rem;
-        }
-
-        .result-rating {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .rating-stars {
-            color: #fbbf24;
-        }
-
-        .favorite-btn {
-            background: var(--success-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
         }
-
-        .favorite-btn:hover {
-            background: #059669;
-            transform: translateY(-1px);
+        
+        .result-card:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
-
-        .favorite-btn.added {
-            background: var(--warning-color);
+        
+        .result-card.peliculas:hover {
+            border-color: var(--cinema-red);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
         }
-
-        .alert {
-            border-radius: var(--border-radius);
-            border: none;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
+        
+        .result-card.libros:hover {
+            border-color: var(--book-brown);
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.3);
         }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #065f46;
-            border-left: 4px solid var(--success-color);
+        
+        .result-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #991b1b;
-            border-left: 4px solid var(--danger-color);
+        
+        .result-title.peliculas {
+            color: var(--cinema-red);
         }
-
-        .alert-info {
-            background: rgba(99, 102, 241, 0.1);
-            color: #3730a3;
-            border-left: 4px solid var(--primary-color);
+        
+        .result-title.libros {
+            color: var(--book-brown);
         }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-        }
-
-        .spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark-color);
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
+        
+        .result-meta {
+            color: var(--book-gold);
             font-weight: 500;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 10px;
         }
-
-        .back-btn:hover {
-            background: white;
-            color: var(--primary-color);
-            text-decoration: none;
-            transform: translateY(-2px);
+        
+        .result-description {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 15px;
         }
-
+        
+        .result-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .result-detail-item {
+            background-color: rgba(139, 69, 19, 0.3);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: var(--book-gold);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
+        
+        .error-message {
+            background-color: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--cinema-red);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: var(--cinema-red);
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner-border {
+            color: var(--book-gold);
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .search-title {
+            .page-title {
                 font-size: 2rem;
             }
             
-            .results-grid {
-                grid-template-columns: 1fr;
+            .search-form {
+                padding: 20px;
             }
             
-            .navigation-tabs {
+            .result-card {
+                padding: 15px;
+            }
+            
+            .result-details {
                 flex-direction: column;
-                align-items: center;
-            }
-            
-            .main-container {
-                padding: 1rem;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="container">
-            <!-- Botón de regreso -->
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Volver al inicio
-            </a>
-
-            <!-- Navegación entre tipos de búsqueda -->
-            <div class="navigation-tabs">
-                <a href="/buscar/peliculas" 
-                   class="nav-tab" 
-                   th:classappend="${searchType == 'peliculas'} ? 'active' : ''">
-                    <i class="fas fa-film"></i> Películas
-                </a>
-                <a href="/buscar/libros" 
-                   class="nav-tab" 
-                   th:classappend="${searchType == 'libros'} ? 'active' : ''">
-                    <i class="fas fa-book"></i> Libros
-                </a>
+    <div class="container search-container">
+        <!-- Header con navegación -->
+        <div class="header-section">
+            <a href="/home" class="back-button">🏠 Volver al Inicio</a>
+            
+            <h1 class="page-title" th:classappend="${searchType}" th:text="${pageTitle}">Buscar</h1>
+            <p class="page-subtitle" th:text="${searchType == 'peliculas' ? 'Descubre tu próxima película favorita' : 'Encuentra tu próxima lectura perfecta'}">Busca contenido increíble</p>
+            
+            <!-- Formulario de búsqueda dinámico -->
+            <form class="search-form" th:action="@{'/buscar/' + ${searchType}}" method="get">
+                <input type="text" 
+                       name="query" 
+                       class="search-input" 
+                       th:classappend="${searchType}"
+                       th:value="${query}"
+                       th:placeholder="${searchPlaceholder}"
+                       required>
+                
+                <button type="submit" class="search-button" th:classappend="${searchType}">
+                    🔍 <span th:text="'Buscar ' + (${searchType == 'peliculas' ? 'Películas' : 'Libros'})">Buscar</span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="error-message">
+            <strong>Error:</strong> <span th:text="${error}"></span>
+        </div>
+        
+        <!-- Spinner de carga -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
             </div>
-
-            <!-- Header de búsqueda -->
-            <div class="search-header">
-                <h1 class="search-title" th:text="${pageTitle}">Buscar Contenido</h1>
-                <p class="search-subtitle" th:text="${searchType == 'peliculas'} ? 'Descubre las mejores películas' : 'Encuentra tu próximo libro favorito'">
-                    Descubre contenido increíble
-                </p>
-
-                <!-- Formulario de búsqueda -->
-                <form class="search-form" method="get">
-                    <div class="search-input-group">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" 
-                               name="query" 
-                               class="search-input"
-                               th:placeholder="${searchPlaceholder} ?: 'Buscar...'"
-                               th:value="${query}"
-                               autofocus>
+            <p th:text="'Buscando ' + (${searchType == 'peliculas' ? 'películas' : 'libros') + '...'">Buscando...</p>
+        </div>
+        
+        <!-- Resultados -->
+        <div th:if="${resultados != null}" class="results-section">
+            <div class="results-header">
+                <h2 class="results-title">Resultados de Búsqueda</h2>
+                <div class="results-count" th:classappend="${searchType}" th:text="${mensaje}"></div>
+            </div>
+            
+            <!-- Lista de resultados -->
+            <div th:if="${!resultados.isEmpty()}">
+                <!-- Para películas -->
+                <div th:if="${searchType == 'peliculas'}" th:each="pelicula : ${resultados}" 
+                     class="result-card peliculas" th:onclick="'mostrarDetalles(' + ${pelicula.id} + ', \'pelicula\')'">
+                    <h3 class="result-title peliculas" th:text="${pelicula.title}">Título</h3>
+                    <div class="result-meta" th:if="${pelicula.release_date}">
+                        📅 <span th:text="${#dates.format(#dates.create(pelicula.release_date), 'yyyy')}">Año</span>
                     </div>
-                    <button type="submit" class="search-btn">
-                        <i class="fas fa-search"></i> Buscar
-                    </button>
-                </form>
-            </div>
-
-            <!-- Contenedor de resultados -->
-            <div class="results-container" th:if="${query != null}">
-                <!-- Mensajes de estado -->
-                <div th:if="${error}" class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Error:</strong> <span th:text="${error}">Error de búsqueda</span>
-                </div>
-
-                <div th:if="${mensaje and not error}" class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <span th:text="${mensaje}">Mensaje informativo</span>
-                </div>
-
-                <!-- Resultados -->
-                <div th:if="${resultados and not error}" class="results-grid">
-                    <div th:each="item : ${resultados}" class="result-card">
-                        <img th:src="${item.imagen}" 
-                             th:alt="${item.titulo}"
-                             class="result-image"
-                             onerror="this.src='/images/no-image.png'">
-                        
-                        <div class="result-content">
-                            <h3 class="result-title" th:text="${item.titulo}">Título</h3>
-                            
-                            <!-- Información específica por tipo -->
-                            <div th:if="${searchType == 'peliculas'}">
-                                <div class="result-info">
-                                    <i class="fas fa-calendar"></i>
-                                    <span th:text="${item.fechaEstreno} ?: 'Fecha no disponible'">Fecha</span>
-                                </div>
-                                <div class="result-rating" th:if="${item.puntuacion}">
-                                    <span class="rating-stars">
-                                        <i class="fas fa-star"></i>
-                                    </span>
-                                    <span th:text="${item.puntuacion} + '/10'">Rating</span>
-                                </div>
-                            </div>
-                            
-                            <div th:if="${searchType == 'libros'}">
-                                <div class="result-info">
-                                    <i class="fas fa-user"></i>
-                                    <span th:text="${item.autores} ?: 'Autor no disponible'">Autor</span>
-                                </div>
-                                <div class="result-info" th:if="${item.editorial}">
-                                    <i class="fas fa-building"></i>
-                                    <span th:text="${item.editorial}">Editorial</span>
-                                </div>
-                            </div>
-                            
-                            <p class="result-description" th:text="${item.descripcion} ?: ${item.sinopsis} ?: 'Sin descripción disponible'">
-                                Descripción del contenido
-                            </p>
-                            
-                            <button class="favorite-btn" 
-                                    th:data-id="${item.id}"
-                                    th:data-titulo="${item.titulo}"
-                                    th:data-tipo="${searchType}"
-                                    onclick="agregarAFavoritos(this)">
-                                <i class="fas fa-heart"></i>
-                                Agregar a Favoritos
-                            </button>
-                        </div>
+                    <div class="result-description" th:if="${pelicula.overview}" 
+                         th:text="${#strings.abbreviate(pelicula.overview, 200)}">Descripción...</div>
+                    <div class="result-details">
+                        <span class="result-detail-item" th:if="${pelicula.vote_average}">
+                            ⭐ <span th:text="${pelicula.vote_average}">0</span>/10
+                        </span>
+                        <span class="result-detail-item" th:if="${pelicula.popularity}">
+                            🔥 <span th:text="${#numbers.formatDecimal(pelicula.popularity, 0, 0)}">0</span>
+                        </span>
+                        <span class="result-detail-item">🎬 Ver Detalles</span>
                     </div>
                 </div>
-
-                <!-- Mensaje cuando no hay resultados -->
-                <div th:if="${query and totalResultados == 0 and not error}" class="loading">
-                    <i class="fas fa-search" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
-                    <h3>No se encontraron resultados</h3>
-                    <p>Intenta con otros términos de búsqueda</p>
+                
+                <!-- Para libros -->
+                <div th:if="${searchType == 'libros'}" th:each="libro : ${resultados}" 
+                     class="result-card libros" th:onclick="'mostrarDetalles(\'' + ${libro.id} + '\', \'libro\')'">
+                    <h3 class="result-title libros" th:text="${libro.volumeInfo?.title ?: 'Sin título'}">Título</h3>
+                    <div class="result-meta" th:if="${libro.volumeInfo?.authors}">
+                        👤 <span th:text="${#strings.listJoin(libro.volumeInfo.authors, ', ')}">Autores</span>
+                    </div>
+                    <div class="result-description" th:if="${libro.volumeInfo?.description}" 
+                         th:text="${#strings.abbreviate(libro.volumeInfo.description, 200)}">Descripción...</div>
+                    <div class="result-details">
+                        <span class="result-detail-item" th:if="${libro.volumeInfo?.publishedDate}">
+                            📅 <span th:text="${libro.volumeInfo.publishedDate}">Fecha</span>
+                        </span>
+                        <span class="result-detail-item" th:if="${libro.volumeInfo?.pageCount}">
+                            📄 <span th:text="${libro.volumeInfo.pageCount}">0</span> páginas
+                        </span>
+                        <span class="result-detail-item" th:if="${libro.volumeInfo?.averageRating}">
+                            ⭐ <span th:text="${libro.volumeInfo.averageRating}">0</span>/5
+                        </span>
+                        <span class="result-detail-item">📖 Ver Detalles</span>
+                    </div>
                 </div>
+            </div>
+            
+            <!-- Sin resultados -->
+            <div th:if="${resultados.isEmpty()}" class="no-results">
+                <h3 th:text="${searchType == 'peliculas' ? '🎭 No se encontraron películas' : '📚 No se encontraron libros'}">Sin resultados</h3>
+                <p>Intenta con otros términos de búsqueda</p>
             </div>
         </div>
     </div>
 
-    <!-- Toast para notificaciones -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="favoriteToast" class="toast" role="alert">
-            <div class="toast-header">
-                <i class="fas fa-heart text-success me-2"></i>
-                <strong class="me-auto">Favoritos</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body" id="toastMessage">
-                Mensaje de favoritos
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-        // Función para agregar a favoritos
-        async function agregarAFavoritos(button) {
-            const id = button.dataset.id;
-            const titulo = button.dataset.titulo;
-            const tipo = button.dataset.tipo;
-            
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agregando...';
-            
-            try {
-                const endpoint = tipo === 'peliculas' ? '/api/favoritos/pelicula' : '/api/favoritos/libro';
-                
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ titulo: titulo })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    button.classList.add('added');
-                    button.innerHTML = '<i class="fas fa-check"></i> ¡Agregado!';
-                    mostrarToast(`"${titulo}" agregado a favoritos`, 'success');
-                } else {
-                    throw new Error(result.error || 'Error desconocido');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-                mostrarToast('Error al agregar a favoritos', 'error');
-            } finally {
-                setTimeout(() => {
-                    button.disabled = false;
-                    if (!button.classList.contains('added')) {
-                        button.innerHTML = '<i class="fas fa-heart"></i> Agregar a Favoritos';
-                    }
-                }, 2000);
-            }
+        // Función para mostrar detalles
+        function mostrarDetalles(id, tipo) {
+            console.log(`Mostrando detalles para ${tipo} ID:`, id);
+            alert(`Ver detalles de ${tipo} ID: ${id}\n(Funcionalidad en desarrollo)`);
         }
         
-        // Función para mostrar toast
-        function mostrarToast(message, type = 'success') {
-            const toastElement = document.getElementById('favoriteToast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastHeader = toastElement.querySelector('.toast-header i');
-            
-            toastMessage.textContent = message;
-            
-            if (type === 'success') {
-                toastHeader.className = 'fas fa-heart text-success me-2';
-            } else {
-                toastHeader.className = 'fas fa-exclamation-triangle text-danger me-2';
-            }
-            
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        }
+        // Mostrar spinner al enviar formulario
+        document.querySelector('.search-form').addEventListener('submit', function() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+        });
         
         // Auto-focus en el campo de búsqueda
         document.addEventListener('DOMContentLoaded', function() {
@@ -542,14 +418,16 @@
             }
         });
         
-        // Búsqueda en tiempo real (opcional)
-        let searchTimeout;
-        function handleSearch() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                // Aquí podrías implementar búsqueda AJAX en tiempo real
-            }, 500);
-        }
+        // Efecto hover para las tarjetas
+        document.querySelectorAll('.result-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
     </script>
 </body>
 </html>
